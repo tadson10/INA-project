@@ -1,6 +1,7 @@
 import json
 from venv import create
-
+import networkx as nx
+from collections import Counter
 
 zones = {
   1: [(0, 18), (18, 62)],
@@ -62,9 +63,25 @@ def get_zone(point):
 
 def create_graphs(match_id):
   passes = get_passes(match_id)
-  # tuki dobimo edge za uspešne pa zgrešene podaje
+  # Get missed and successful passes as edges between zones
   zones_missed, zones_succ = get_passing_zones(passes)
-  print(zones_missed)
+
+  # Count passes between zones
+  edges_missed = Counter(zones_missed)
+  edges_succ = Counter(zones_succ)
+
+  # List of all zones
+  nodes = list(range(1,9))
+
+  G_missed = nx.DiGraph(name = "Missed passes")
+  G_missed.add_nodes_from(nodes)
+  G_missed.add_edges_from([(x, y, {'weight': v}) for (x, y), v in edges_missed.items()])
+
+  G_succ = nx.DiGraph(name = "Missed successful")
+  G_succ.add_nodes_from(nodes)
+  G_succ.add_edges_from([(x, y, {'weight': v}) for (x, y), v in edges_succ.items()])
+
+  return G_missed, G_succ
 
 # get_passes(15946)
 create_graphs(15946)
