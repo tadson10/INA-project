@@ -83,5 +83,13 @@ def create_graphs(match_id):
 
   return G_missed, G_succ
 
+
+# Barcelona-villarreal: 3773593
+# Barcelona-Real: 3773585
+
+# get_match_data(11, 90, 3773593)
+# get_match_data(11, 90, 3773585)
+
 # get_passes(15946)
-create_graphs(15946)
+create_graphs(3773593)
+create_graphs(3773585)
