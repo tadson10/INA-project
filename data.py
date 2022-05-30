@@ -30,8 +30,9 @@ def get_passes(match_id, team_name):
     with open(f'./data/events/{match_id}.json', encoding='utf-8') as f:
         events = json.load(f)
         for event in events:
-            if event["type"]["id"] == 30 and event["possession_team"]["name"] == team_name:
+            if event["type"]["id"] == 30 and event["team"]["name"] == team_name:
                 passes.append(event)
+            
     return passes
 
 
@@ -108,10 +109,12 @@ def create_player_zone_graph(match_id, team_name):
             zone_start = get_zone(start)
             zone_end = get_zone(end)
             player_passer = pess['player']['id']
+            player_passer_name = pess['player']['name']
+            player_recipient_name = ''
             player_recipient = -1
 
-            node_start = (zone_start, player_passer)
-            node_end = (zone_end, player_recipient)
+            node_start = (zone_start, player_passer, player_passer_name)
+            node_end = (zone_end, player_recipient, player_recipient_name)
             edge = (node_start, node_end)
 
             nodes_fail.add(node_start)
@@ -122,10 +125,12 @@ def create_player_zone_graph(match_id, team_name):
             zone_start = get_zone(start)
             zone_end = get_zone(end)
             player_passer = pess['player']['id']
+            player_passer_name = pess['player']['name']
             player_recipient = pess["pass"]["recipient"]["id"]
+            player_recipient_name = pess["pass"]["recipient"]["name"]
 
-            node_start = (zone_start, player_passer)
-            node_end = (zone_end, player_recipient)
+            node_start = (zone_start, player_passer, player_passer_name)
+            node_end = (zone_end, player_recipient, player_recipient_name)
             edge = (node_start, node_end)
 
             nodes_succ.add(node_start)
@@ -143,11 +148,11 @@ def create_player_zone_graph(match_id, team_name):
 
     for i, label in enumerate(nodes_fail):
         nodes_dict['fail'][label] = i
-        G_missed.add_node(i, zone=label[0], player=label[1])
+        G_missed.add_node(i, zone=label[0], player=label[1], player_name=label[2])
 
     for i, label in enumerate(nodes_succ):
         nodes_dict['succ'][label] = i
-        G_succ.add_node(i, zone=label[0], player=label[1])
+        G_succ.add_node(i, zone=label[0], player=label[1], player_name=label[2])
 
     count_edges_fail = Counter(edges_fail)
     for edge_label, edge_weight in count_edges_fail.items():
